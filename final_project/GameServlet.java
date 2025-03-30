@@ -16,10 +16,12 @@ public class GameServlet extends HttpServlet {
             List<Players> playerList = new ArrayList<>();
             playerList.add(new Players("Player 1"));
             playerList.add(new Players("Player 2"));
+            playerList.add(new Players("Player 3"));
+            playerList.add(new Players("Player 4"));
 
             List<Grid> gridsList = new ArrayList<>();
-            for (int i = 0; i < 20; i++) {
-                gridsList.add(new Land("Land " + i, 100 + i * 10));
+            for (int i = 0; i < 76; i++) {
+                gridsList.add(new Land("Land " + i, 100 + i * 10)); // TODO: 第二個參數代表價錢，現在為預設，需更改成正確的數值
             }
 
             gameInstance = new Monopoly("Monopoly", playerList, gridsList);

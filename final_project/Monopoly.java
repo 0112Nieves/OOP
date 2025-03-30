@@ -1,12 +1,17 @@
 import java.util.*;
 
 public class Monopoly extends Game {
-    private List<Grid> gridsList;
+    protected List<Grid> gridsList;
+    protected List<Grid> landList;
+    protected List<Grid> cardList;
+
     private int currentPlayerIndex;
 
-    public Monopoly(String gameName, List<Players> playerList, List<Grid> gridsList) {
+    public Monopoly(String gameName, List<Players> playerList, List<Grid> gridsList, List<Grid> landList, List<Grid> cardList) {
         super(gameName, playerList);
         this.gridsList = gridsList;
+        this.landList = landList;
+        this.cardList = cardList;
         this.currentPlayerIndex = 0;
     }
 
@@ -29,5 +34,11 @@ public class Monopoly extends Game {
 
     public List<Grid> getGridsList() {
         return gridsList;
+    }
+    public List<Grid> getlandList(){
+        return landList;
+    }
+    public List<Grid> getcardList(){
+        return cardList;
     }
 }

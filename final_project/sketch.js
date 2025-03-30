@@ -91,7 +91,7 @@ function draw() {
       moveSteps--;
       if (moveSteps <= 0) {
         moving = false;
-        currentPlayer = (currentPlayer + 1) % players.length;
+        nextPlayer();
       }
     }
   }
@@ -145,11 +145,21 @@ function drawDice(x, y, number) {
   text(number, x, y);
 }
 
-// 按下按鈕擲骰
+// 按下擲骰按鈕觸發
 function rollDice() {
   if (!rolling && !moving) {
     rolling = true;
     rollStartTime = millis();
+
+    // 呼叫後端 GameServlet 的 "start" action
+    fetch('/game?action=start')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data.message); // 顯示遊戲初始化消息
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
 
     setTimeout(() => {
       let finalRoll = floor(random(1, 7));
@@ -160,6 +170,30 @@ function rollDice() {
       players[currentPlayer].moveStartTime = millis();
     }, rollDuration);
   }
+}
+
+// 當遊戲結束當前回合，進行下一位玩家的操作
+function nextPlayer() {
+  fetch('/game?action=nextPlayer')
+    .then(response => response.json())
+    .then(data => {
+      console.log("Current Player:", data.currentPlayer);
+      console.log("Current Position:", data.position);
+      console.log("Landed Grid:", data.landedGrid);
+      
+      // 根據回傳的資料更新玩家位置、當前玩家等
+      players[currentPlayer].index = data.position;
+      currentPlayer = (currentPlayer + 1) % players.length;
+
+      // 重新開始下一位玩家的回合
+      moveSteps = 0;
+      moveIndex = players[currentPlayer].index;
+      moving = false;
+      showPosition = false;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
 }
 
 // 顯示/隱藏位置功能仍保留
