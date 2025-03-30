@@ -91,7 +91,6 @@ function draw() {
       moveSteps--;
       if (moveSteps <= 0) {
         moving = false;
-        nextPlayer();
       }
     }
   }
@@ -170,30 +169,6 @@ function rollDice() {
       players[currentPlayer].moveStartTime = millis();
     }, rollDuration);
   }
-}
-
-// 當遊戲結束當前回合，進行下一位玩家的操作
-function nextPlayer() {
-  fetch('/game?action=nextPlayer')
-    .then(response => response.json())
-    .then(data => {
-      console.log("Current Player:", data.currentPlayer);
-      console.log("Current Position:", data.position);
-      console.log("Landed Grid:", data.landedGrid);
-      
-      // 根據回傳的資料更新玩家位置、當前玩家等
-      players[currentPlayer].index = data.position;
-      currentPlayer = (currentPlayer + 1) % players.length;
-
-      // 重新開始下一位玩家的回合
-      moveSteps = 0;
-      moveIndex = players[currentPlayer].index;
-      moving = false;
-      showPosition = false;
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
 }
 
 // 顯示/隱藏位置功能仍保留
