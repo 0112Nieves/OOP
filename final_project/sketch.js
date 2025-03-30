@@ -91,6 +91,7 @@ function draw() {
       moveSteps--;
       if (moveSteps <= 0) {
         moving = false;
+        currentPlayer = (currentPlayer + 1) % players.length;
       }
     }
   }
