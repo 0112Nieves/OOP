@@ -126,7 +126,7 @@ shared_ptr<Rental> RegularCustomer::createRental(const vector<shared_ptr<Video>>
 }
 
 void VideoStore::initialize() {
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i) {/*  */
         allVideos.push_back(make_shared<Video>("NewRelease_" + to_string(i), Category::NewRelease, 5.0));
         allVideos.push_back(make_shared<Video>("Drama_" + to_string(i), Category::Drama, 3.0));
         allVideos.push_back(make_shared<Video>("Comedy_" + to_string(i), Category::Comedy, 2.0));
@@ -188,13 +188,12 @@ void VideoStore::runSimulation(int days) {
 }
 
 void VideoStore::printReport() const {
-    cout << "\n===== Final Report =====\n";
+    cout << "===== Final Report =====\n";
     cout << "Videos remaining in store: " << inventory.size() << endl;
     for (auto& v : inventory) {
         cout << " - " << v->getName() << " (" << categoryToString(v->getCategory()) << ")\n";
     }
     cout << "Total revenue: $" << totalRevenue << endl;
-    cout << "(Note: rental logs not implemented yet)\n";
 }
 
 int main() {
