@@ -91,6 +91,7 @@ class VideoStore {
     vector<shared_ptr<Video>> inventory;
     vector<shared_ptr<Customer>> customers;
     vector<shared_ptr<Rental>> allRentals;
+    vector<shared_ptr<Rental>> completedRentals; 
     double totalRevenue = 0;
     int currentDay = 0;
 
@@ -101,7 +102,6 @@ public:
     void printReport() const;
 };
 
-// stub implementations for customer types
 template <typename T>
 shared_ptr<Rental> makeRental(shared_ptr<Customer> cust, const vector<shared_ptr<Video>>& inventory, int minV, int maxV, int minN, int maxN, int currentDay) {
     int count = rand() % (maxV - minV + 1) + minV;
@@ -126,7 +126,7 @@ shared_ptr<Rental> RegularCustomer::createRental(const vector<shared_ptr<Video>>
 }
 
 void VideoStore::initialize() {
-    for (int i = 0; i < 4; ++i) {/*  */
+    for (int i = 0; i < 4; ++i) {
         allVideos.push_back(make_shared<Video>("NewRelease_" + to_string(i), Category::NewRelease, 5.0));
         allVideos.push_back(make_shared<Video>("Drama_" + to_string(i), Category::Drama, 3.0));
         allVideos.push_back(make_shared<Video>("Comedy_" + to_string(i), Category::Comedy, 2.0));
@@ -148,21 +148,20 @@ void VideoStore::initialize() {
 }
 
 void VideoStore::simulateDay() {
-    // 處理歸還
     vector<shared_ptr<Video>> returnedToday;
     for (auto it = allRentals.begin(); it != allRentals.end(); ) {
         if ((*it)->isReturned(currentDay)) {
             for (auto& v : (*it)->getVideos()) {
                 returnedToday.push_back(v);
             }
-            it = allRentals.erase(it); // 移除已完成租借
+            completedRentals.push_back(*it);
+            it = allRentals.erase(it);
         } else {
             ++it;
         }
     }
     inventory.insert(inventory.end(), returnedToday.begin(), returnedToday.end());
 
-    // 模擬最多 5 位顧客來店
     int customerCount = rand() % 5 + 1;
     random_shuffle(customers.begin(), customers.end());
 
@@ -170,7 +169,6 @@ void VideoStore::simulateDay() {
         auto& cust = customers[i];
         auto rental = cust->createRental(inventory, currentDay);
         if (rental) {
-            // 從庫存中移除租出去的影片
             for (auto& v : rental->getVideos()) {
                 auto it = find(inventory.begin(), inventory.end(), v);
                 if (it != inventory.end()) inventory.erase(it);
@@ -188,12 +186,30 @@ void VideoStore::runSimulation(int days) {
 }
 
 void VideoStore::printReport() const {
-    cout << "===== Final Report =====\n";
+    cout << "\n===== Final Report =====\n";
     cout << "Videos remaining in store: " << inventory.size() << endl;
     for (auto& v : inventory) {
         cout << " - " << v->getName() << " (" << categoryToString(v->getCategory()) << ")\n";
     }
-    cout << "Total revenue: $" << totalRevenue << endl;
+    cout << "Total revenue: $" << totalRevenue << "\n";
+
+    cout << "\n===== Completed Rentals =====\n";
+    for (auto& rental : completedRentals) {
+        cout << rental->getCustomer()->getName() << " rented:\n";
+        for (auto& v : rental->getVideos()) {
+            cout << "  - " << v->getName() << " (" << categoryToString(v->getCategory()) << ")\n";
+        }
+        cout << "  For " << rental->getNights() << " days, Total: $" << rental->getTotalPrice() << "\n\n";
+    }
+
+    cout << "\n===== Active Rentals =====\n";
+    for (auto& rental : allRentals) {
+        cout << rental->getCustomer()->getName() << " rented:\n";
+        for (auto& v : rental->getVideos()) {
+            cout << "  - " << v->getName() << " (" << categoryToString(v->getCategory()) << ")\n";
+        }
+        cout << "  For " << rental->getNights() << " days, Total: $" << rental->getTotalPrice() << "\n\n";
+    }
 }
 
 int main() {
